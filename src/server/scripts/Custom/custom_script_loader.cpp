@@ -22,9 +22,12 @@
 // void Add${NameOfDirectory}Scripts()
 
 void AddSC_Professions_NPC();
+void AddSC_npc_trainer();
+void AddSC_Enchat_npc_new();
 
 void AddCustomScripts()
 {
     AddSC_Professions_NPC();
-    // MyExampleScript()
+    AddSC_npc_trainer();
+    AddSC_Enchat_npc_new();
 }
