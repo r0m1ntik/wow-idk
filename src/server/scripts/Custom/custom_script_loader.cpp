@@ -21,10 +21,10 @@
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
 
-void AddSC_Professions_NPC()
+void AddSC_Professions_NPC();
 
 void AddCustomScripts()
 {
-    AddSC_Professions_NPC()
+    AddSC_Professions_NPC();
     // MyExampleScript()
 }

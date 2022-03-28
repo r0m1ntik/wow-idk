@@ -10,17 +10,8 @@
 
 #define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
-uint8 sProfession::CountPlayerCanLearn(const Player *player) {
+uint8 sProfession::CountPlayerCanLearn() {
     return 2;
-}
-
-void sProfession::CompleteQuest(Player* player)
-{
-    /* custom quest */
-    if(player->GetQuestStatus(26035) == QUEST_STATUS_INCOMPLETE)
-        player->KilledMonsterCredit(26035, 0);
-    else if (player->GetQuestStatus(26036) == QUEST_STATUS_INCOMPLETE)
-        player->KilledMonsterCredit(26036, 0);
 }
 
 bool sProfession::PlayerAlreadyHasMaxProfessions(const Player *player)
@@ -29,7 +20,7 @@ bool sProfession::PlayerAlreadyHasMaxProfessions(const Player *player)
     for (const auto& i: _PROF)
         if(player->HasSkill(i) && !IsSecondarySkill(i))
             skillCount++;
-    return (CountPlayerCanLearn(player) > skillCount) ? false : true;
+    return (CountPlayerCanLearn() > skillCount) ? false : true;
 }
 
 bool sProfession::LearnAllRecipesInProfession(Player *player, uint32 skill)
@@ -148,24 +139,24 @@ bool sProfession::LearnAllRecipesInProfession(Player *player, uint32 skill)
         {
             if (SkillLineAbilityEntry const *SkillLine = sSkillLineAbilityStore.LookupEntry(i))
             {
-                if (SkillLine->skillId != SkillInfo->id)
+                if (SkillLine->SkillLine != SkillInfo->id)
                     continue;
 
-                if (SkillLine->forward_spellid)
+                if (SkillLine->SupercededBySpell)
                     continue;
 
-                if (SkillLine->racemask != 0)
+                if (SkillLine->RaceMask != 0)
                     continue;
 
-                if (SkillLine->classmask && (SkillLine->classmask & ClassMask) == 0)
+                if (SkillLine->ClassMask && (SkillLine->ClassMask & ClassMask) == 0)
                     continue;
 
-                SpellInfo const *SpellInfo2 = sSpellMgr->GetSpellInfo(SkillLine->spellId);
+                SpellInfo const *SpellInfo2 = sSpellMgr->GetSpellInfo(SkillLine->Spell);
 
                 if (!SpellInfo2 || !SpellMgr::IsSpellValid(SpellInfo2))
                     continue;
 
-                player->learnSpell(SkillLine->spellId);
+                player->learnSpell(SkillLine->Spell);
             }
         }
     }
@@ -183,22 +174,20 @@ void sProfession::CompleteLearnProfession(Player *player, uint32 skill) {
     }
     else {
         LearnAllRecipesInProfession(player, skill);
-        if(!IsSecondarySkill(skill))
-            CompleteQuest(player);
     }
     player->PlayerTalkClass->SendCloseGossip();
 }
 
-void sProfession::MainMenu(Player *player) {
+void sProfession::MainMenu(Player *player, Creature* creature) {
     player->PlayerTalkClass->ClearMenus();
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_17,EN_player_proff_text_17), GOSSIP_SENDER_MAIN, 1); // second
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_18,EN_player_proff_text_18), GOSSIP_SENDER_MAIN, 2); // primary
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_back,EN_back), GOSSIP_SENDER_MAIN, 3); //  на главное меню
     player->PlayerTalkClass->GetGossipMenu().SetMenuId(GossipHelloMenu + 2);
-    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
+    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), creature->GetGUID());
 }
 
-void sProfession::PrimaryMenu(Player *player) {
+void sProfession::PrimaryMenu(Player *player, Creature* creature) {
     player->PlayerTalkClass->ClearMenus();
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_20,EN_player_proff_text_20), GOSSIP_SENDER_MAIN + 1, SKILL_ALCHEMY);
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_21,EN_player_proff_text_21), GOSSIP_SENDER_MAIN + 1, SKILL_BLACKSMITHING);
@@ -212,31 +201,31 @@ void sProfession::PrimaryMenu(Player *player) {
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_29,EN_player_proff_text_29), GOSSIP_SENDER_MAIN + 1, SKILL_SKINNING);
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_30,EN_player_proff_text_30), GOSSIP_SENDER_MAIN + 1, SKILL_MINING);
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_back,EN_back), GOSSIP_SENDER_MAIN, 0);
-    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, player->GetGUID());
+    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
 }
 
-void sProfession::SecondMenu(Player *player) {
+void sProfession::SecondMenu(Player *player, Creature* creature) {
     player->PlayerTalkClass->ClearMenus();
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_31,EN_player_proff_text_31), GOSSIP_SENDER_MAIN + 1, SKILL_FIRST_AID);
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_32,EN_player_proff_text_32), GOSSIP_SENDER_MAIN + 1, SKILL_FISHING);
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_proff_text_33,EN_player_proff_text_33), GOSSIP_SENDER_MAIN + 1, SKILL_COOKING);
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_back,EN_back), GOSSIP_SENDER_MAIN, 0);
-    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
+    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), creature->GetGUID());
 }
 
 void sProfession::ReagentsMenu(Player *player, Creature* creature) {
     player->PlayerTalkClass->ClearMenus();
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_1,EN_player_reagents_1), GOSSIP_SENDER_MAIN, 44001);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_2,EN_player_reagents_2), GOSSIP_SENDER_MAIN, 44002);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_3,EN_player_reagents_3), GOSSIP_SENDER_MAIN, 44003);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_4,EN_player_reagents_4), GOSSIP_SENDER_MAIN, 44004);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_5,EN_player_reagents_5), GOSSIP_SENDER_MAIN, 44005);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_6,EN_player_reagents_6), GOSSIP_SENDER_MAIN, 44006);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_7,EN_player_reagents_7), GOSSIP_SENDER_MAIN, 44007);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_8,EN_player_reagents_8), GOSSIP_SENDER_MAIN, 44008);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_9,EN_player_reagents_9), GOSSIP_SENDER_MAIN, 44009);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_10,EN_player_reagents_10), GOSSIP_SENDER_MAIN, 44010);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_11,EN_player_reagents_11), GOSSIP_SENDER_MAIN, 44011);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_1,EN_player_reagents_1), GOSSIP_SENDER_MAIN, 44008);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_2,EN_player_reagents_2), GOSSIP_SENDER_MAIN, 44009);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_3,EN_player_reagents_3), GOSSIP_SENDER_MAIN, 44010);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_4,EN_player_reagents_4), GOSSIP_SENDER_MAIN, 44011);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_5,EN_player_reagents_5), GOSSIP_SENDER_MAIN, 44012);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_6,EN_player_reagents_6), GOSSIP_SENDER_MAIN, 44013);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_7,EN_player_reagents_7), GOSSIP_SENDER_MAIN, 44014);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_8,EN_player_reagents_8), GOSSIP_SENDER_MAIN, 44015);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_9,EN_player_reagents_9), GOSSIP_SENDER_MAIN, 44016);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_10,EN_player_reagents_10), GOSSIP_SENDER_MAIN, 44017);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player,RU_player_reagents_11,EN_player_reagents_11), GOSSIP_SENDER_MAIN, 44018);
     player->PlayerTalkClass->SendGossipMenu(HeadMenuNPC(player), creature->GetGUID());
 }
 
