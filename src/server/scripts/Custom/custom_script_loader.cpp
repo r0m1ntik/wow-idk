@@ -25,6 +25,7 @@ void AddSC_Professions_NPC();
 void AddSC_npc_trainer();
 void AddSC_Enchat_npc_new();
 void AddSC_Login_script();
+void AddSC_DuelReset();
 
 void AddCustomScripts()
 {
@@ -32,4 +33,5 @@ void AddCustomScripts()
     AddSC_npc_trainer();
     AddSC_Enchat_npc_new(); 
     AddSC_Login_script();
+    AddSC_DuelReset();
 }
