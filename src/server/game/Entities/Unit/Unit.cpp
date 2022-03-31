@@ -16350,7 +16350,7 @@ void Unit::AddComboPoints(Unit* target, int8 count)
     {
         return;
     }
-
+    
     if (target && target != m_comboTarget)
     {
         if (m_comboTarget)

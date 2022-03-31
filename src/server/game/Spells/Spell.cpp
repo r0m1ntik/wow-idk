@@ -4474,7 +4474,7 @@ void Spell::SendSpellStart()
         castFlags |= CAST_FLAG_PROJECTILE;
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER || (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-        && m_spellInfo->PowerType != POWER_HEALTH && m_powerCost != 0)
+        && m_spellInfo->PowerType != POWER_HEALTH)  
     {
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
     }
@@ -4532,7 +4532,7 @@ void Spell::SendSpellGo()
         castFlags |= CAST_FLAG_PROJECTILE;                        // arrows/bullets visual
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER || (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-        && m_spellInfo->PowerType != POWER_HEALTH && m_powerCost != 0) // should only be sent to self, but the current messaging doesn't make that possible
+        && m_spellInfo->PowerType != POWER_HEALTH) // should only be sent to self, but the current messaging doesn't make that possible
     {
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
     }
