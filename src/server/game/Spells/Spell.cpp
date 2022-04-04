@@ -2925,8 +2925,9 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         if (m_originalCaster)
         {
             bool refresh = false;
+            bool refreshPeriodic = m_spellInfo->StackAmount < 2 && !(_triggeredCastFlags & TRIGGERED_NO_PERIODIC_RESET);
             m_spellAura = Aura::TryRefreshStackOrCreate(aurSpellInfo, effectMask, unit, m_originalCaster,
-                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, ObjectGuid::Empty, &refresh, !(_triggeredCastFlags & TRIGGERED_NO_PERIODIC_RESET));
+                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, ObjectGuid::Empty, &refresh, refreshPeriodic);
 
             // xinef: if aura was not refreshed, add proc ex
             if (!refresh)
@@ -4473,10 +4474,22 @@ void Spell::SendSpellStart()
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
         castFlags |= CAST_FLAG_PROJECTILE;
 
-    if ((m_caster->GetTypeId() == TYPEID_PLAYER || (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-        && m_spellInfo->PowerType != POWER_HEALTH)  
+    if (m_caster->GetTypeId() == TYPEID_PLAYER || m_caster->IsPet())
     {
-        castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+        switch (m_spellInfo->PowerType)
+        {
+            case POWER_HEALTH:
+                break;
+            case POWER_RUNE:
+                castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+                break;
+            default:
+                if (m_powerCost != 0)
+                {
+                    castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+                }
+                break;
+        }
     }
 
     if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
@@ -4531,10 +4544,23 @@ void Spell::SendSpellGo()
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
         castFlags |= CAST_FLAG_PROJECTILE;                        // arrows/bullets visual
 
-    if ((m_caster->GetTypeId() == TYPEID_PLAYER || (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
-        && m_spellInfo->PowerType != POWER_HEALTH) // should only be sent to self, but the current messaging doesn't make that possible
+    // should only be sent to self, but the current messaging doesn't make that possible
+    if (m_caster->GetTypeId() == TYPEID_PLAYER || m_caster->IsPet())
     {
-        castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+        switch (m_spellInfo->PowerType)
+        {
+            case POWER_HEALTH:
+                break;
+            case POWER_RUNE:
+                castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+                break;
+            default:
+                if (m_powerCost != 0)
+                {
+                    castFlags |= CAST_FLAG_POWER_LEFT_SELF;
+                }
+                break;
+        }
     }
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
