@@ -560,6 +560,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                     player->GetSession()->SendPacket(&status);
 
                     player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
+                    player->SetCommandStatusOff(CHEAT_CASTTIME);
                     player->ResetAllPowers();
                     // remove auras with duration lower than 30s
                     Unit::AuraApplicationMap& auraMap = player->GetAppliedAuras();
@@ -612,6 +613,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             {
+                itr->second->SetCommandStatusOff(CHEAT_CASTTIME);
                 itr->second->RemoveAurasDueToSpell(SPELL_PREPARATION);
                 itr->second->ResetAllPowers();
             }
@@ -1113,13 +1115,16 @@ void Battleground::AddPlayer(Player* player)
         if (GetStatus() == STATUS_WAIT_JOIN)                 // not started yet
         {
             player->CastSpell(player, SPELL_ARENA_PREPARATION, true);
+            player->SetCommandStatusOn(CHEAT_CASTTIME);
             player->ResetAllPowers();
         }
     }
     else
     {
-        if (GetStatus() == STATUS_WAIT_JOIN)                 // not started yet
+        if (GetStatus() == STATUS_WAIT_JOIN) {                // not started yet
             player->CastSpell(player, SPELL_PREPARATION, true);   // reduces all mana cost of spells.
+            player->SetCommandStatusOn(CHEAT_CASTTIME);
+        }
     }
 
     // Xinef: reset all map criterias on map enter
@@ -1265,7 +1270,7 @@ void Battleground::ReadyMarkerClicked(Player* p)
     readyMarkerClickedSet.insert(p->GetGUID());
     uint32 count = readyMarkerClickedSet.size();
     uint32 req = ArenaTeam::GetReqPlayersForType(GetArenaType());
-    p->GetSession()->SendNotification("You are marked as ready %u/%u", count, req);
+    ChatHandler(p->GetSession()).PSendSysMessage("|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Ready Marker]: |cffffff4d%u/%u|r", count, req);
     if (count == req)
     {
         m_Events |= BG_STARTING_EVENT_2;

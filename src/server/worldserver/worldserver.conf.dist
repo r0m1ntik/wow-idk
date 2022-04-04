@@ -2964,6 +2964,14 @@ Arena.GamesRequired = 10
 Arena.QueueAnnouncer.Enable = 0
 
 #
+#    Arena.LeaveAnnouncer.Enable
+#        Description: Announce arena leave status to chat.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Arena.LeaveAnnouncer.Enable = 0
+#
+
 #    Battleground.QueueAnnouncer.PlayerOnly
 #        Description: Battleground queue announcement type.
 #        Default:     0 - (System message, Anyone can see it)
