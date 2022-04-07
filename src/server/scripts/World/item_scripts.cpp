@@ -33,6 +33,10 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
+#include "Translate.h"
+#include "WorldSession.h"
+
+#define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
 /*#####
 # item_only_for_flight
@@ -269,6 +273,27 @@ public:
     }
 };
 
+class BonusGetOnAccountItem : public ItemScript
+{
+public:
+    BonusGetOnAccountItem() : ItemScript("BonusGetOnAccountItem") { }
+
+    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override
+    {
+        /* ид предмета */
+        uint32 entry = item->GetEntry();
+        /* выводим количество предметов */
+        uint32 count = player->GetItemCount(entry, true);
+        /* удаляем предметы */
+        player->DestroyItemCount(entry, count, true);
+        /* выдаем бонусы */
+        // player->GetSession()->SetBonuses(player->GetSession()->GetBonuses() + count);
+        /* анонс игроку */
+        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_GET_BONUS_USE_ITEM, EN_GET_BONUS_USE_ITEM), count);
+        return false;
+    }
+};
+
 void AddSC_item_scripts()
 {
     new item_only_for_flight();
@@ -280,4 +305,5 @@ void AddSC_item_scripts()
     new item_petrov_cluster_bombs();
     new item_captured_frog();
     new item_generic_limit_chance_above_60();
+    new BonusGetOnAccountItem();
 }
