@@ -29,6 +29,7 @@ void AddSC_DuelReset();
 void AddSC_CustomTeleportOrCommand();
 void AddSC_TemplateNPC();
 void AddSC_npc_1v1arena();
+void AddSC_DeathMatchkill();
 
 void AddCustomScripts()
 {
@@ -40,4 +41,5 @@ void AddCustomScripts()
     AddSC_CustomTeleportOrCommand();
     AddSC_TemplateNPC();
     AddSC_npc_1v1arena();
+    AddSC_DeathMatchkill();
 }
