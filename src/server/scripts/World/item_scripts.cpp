@@ -280,17 +280,25 @@ public:
 
     bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override
     {
+        if (!player || !item)
+            return true;
+
+        if (!player->GetSession())
+            return true;    
+            
         /* ид предмета */
         uint32 entry = item->GetEntry();
         /* выводим количество предметов */
         uint32 count = player->GetItemCount(entry, true);
+        /* выводим бонусы игрока */
+        uint32 bonuses = player->GetSession()->GetBonuses();
         /* удаляем предметы */
         player->DestroyItemCount(entry, count, true);
         /* выдаем бонусы */
-        // player->GetSession()->SetBonuses(player->GetSession()->GetBonuses() + count);
+        player->GetSession()->SetBonuses(bonuses + count);
         /* анонс игроку */
         ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_GET_BONUS_USE_ITEM, EN_GET_BONUS_USE_ITEM), count);
-        return false;
+        return true;
     }
 };
 
