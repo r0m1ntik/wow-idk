@@ -2,14 +2,9 @@
 # AzerothCore
 #
 
+/modules/*
 /conf/*
 !/conf/dist
-/modules/*
-!/modules/*.md
-!/modules/*.sh
-!/modules/CMakeLists.txt
-!/modules/*.h
-!/modules/*.cmake
 /build*/
 /var/*
 !/var/build/.gitkeep
@@ -92,6 +87,9 @@ local.properties
 #  for example , if you want to include a
 #  module directly in repositoryyou can do:
 #
-#  !modules/yourmodule
+!modules/mod-cfbg
+!modules/mod-learn-highest-talent
+!modules/mod-learn-spells
+!modules/mod-transmog
 #
 # ==================
