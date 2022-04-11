@@ -211,50 +211,51 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     else
     {
         Group* grp = _player->GetGroup();
+
         // no group or not a leader
         if (!grp || grp->GetLeaderGUID() != _player->GetGUID())
             return;
 
         grp->DoForAllMembers([&err, bgQueueTypeId, bgQueueTypeIdRandom, bgTypeId](Player* member)
-         {
-             if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
-             {
-                 err = ERR_IN_RANDOM_BG;
-             }
-             else if (member->InBattlegroundQueue() && bgTypeId == BATTLEGROUND_RB) // already in queue, so can't queue for random
-             {
-                 err = ERR_IN_NON_RANDOM_BG;
-             }
-             else if (member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_2v2) ||
-                 member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
-                 member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
-             {
-                 err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
-             }
-             else if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId)) // queued for this bg
-             {
-                 err = ERR_BATTLEGROUND_NONE;
-             }
+        {
+            if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
+            {
+                err = ERR_IN_RANDOM_BG;
+            }
+            else if (member->InBattlegroundQueue() && bgTypeId == BATTLEGROUND_RB) // already in queue, so can't queue for random
+            {
+                err = ERR_IN_NON_RANDOM_BG;
+            }
+            else if (member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_2v2) ||
+                member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
+                member->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
+            {
+                err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
+            }
+            else if (member->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId)) // queued for this bg
+            {
+                err = ERR_BATTLEGROUND_NONE;
+            }
             if (err < 0)
-             {
-                 return;
-             }
-         });
+            {
+                return;
+            }
+        });
 
-         if (err <= 0)
-         {
-             grp->DoForAllMembers([err](Player* member)
-             {
-                 WorldPacket data;
-                 sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-                 member->GetSession()->SendPacket(&data);
-             });
+        if (err <= 0)
+        {
+            grp->DoForAllMembers([err](Player* member)
+            {
+                WorldPacket data;
+                sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
+                member->GetSession()->SendPacket(&data);
+            });
 
-             return;
-         }
+            return;
+        }
 
-         ASSERT(err > 0);
-         err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
+        ASSERT(err > 0);
+        err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
 
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam() && bgTypeId != BATTLEGROUND_RB);
         uint32 avgWaitTime = 0;
