@@ -31,22 +31,23 @@
 
 DoorData const doorData[] =
 {
-    { GO_PORTCULLIS_RAZORGORE,      DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175946 || GUID 7230
-    { GO_PORTCULLIS_RAZORGORE_ROOM, DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_ROOM,    BOUNDARY_NONE}, // ID 176964 || GUID 75158
-    { GO_PORTCULLIS_VAELASTRASZ,    DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 175185 || GUID 7229
-    { GO_PORTCULLIS_BROODLORD,      DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179365 || GUID 75159
-    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FIREMAW,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_THREEDRAGONS,   DATA_EBONROC,                DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FLAMEGOR,               DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179115 || GUID 75165
-    { GO_PORTCULLIS_CHROMAGGUS,     DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE, BOUNDARY_NONE}, // ID 179116 || GUID 75161
-    { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM,    BOUNDARY_NONE}, // ID 179117 || GUID 75164
-    { 0,                            0,                           DOOR_TYPE_ROOM,    BOUNDARY_NONE}  // END
+    { GO_PORTCULLIS_RAZORGORE,      DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_PASSAGE }, // ID 175946 || GUID 7230
+    { GO_PORTCULLIS_RAZORGORE_ROOM, DATA_RAZORGORE_THE_UNTAMED,  DOOR_TYPE_ROOM,   }, // ID 176964 || GUID 75158
+    { GO_PORTCULLIS_VAELASTRASZ,    DATA_VAELASTRAZ_THE_CORRUPT, DOOR_TYPE_PASSAGE }, // ID 175185 || GUID 7229
+    { GO_PORTCULLIS_BROODLORD,      DATA_BROODLORD_LASHLAYER,    DOOR_TYPE_PASSAGE }, // ID 179365 || GUID 75159
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FIREMAW,                DOOR_TYPE_PASSAGE }, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_EBONROC,                DOOR_TYPE_PASSAGE }, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_THREEDRAGONS,   DATA_FLAMEGOR,               DOOR_TYPE_PASSAGE }, // ID 179115 || GUID 75165
+    { GO_PORTCULLIS_CHROMAGGUS,     DATA_CHROMAGGUS,             DOOR_TYPE_PASSAGE }, // ID 179116 || GUID 75161
+    { GO_PORTCULLIS_NEFARIAN,       DATA_NEFARIAN,               DOOR_TYPE_ROOM    }, // ID 179117 || GUID 75164
+    { 0,                            0,                           DOOR_TYPE_ROOM    }  // END
 };
 
 ObjectData const creatureData[] =
 {
-    { NPC_GRETHOK,         DATA_GRETHOK         },
-    { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS }
+    { NPC_GRETHOK,         DATA_GRETHOK              },
+    { NPC_NEFARIAN_TROOPS, DATA_NEFARIAN_TROOPS      },
+    { NPC_VICTOR_NEFARIUS, DATA_LORD_VICTOR_NEFARIUS }
 };
 
 Position const SummonPosition[8] =
@@ -127,25 +128,18 @@ public:
                 case NPC_NEFARIAN:
                     nefarianGUID = creature->GetGUID();
                     break;
-                case NPC_VICTOR_NEFARIUS:
-                    victorNefariusGUID = creature->GetGUID();
-                    break;
                 case NPC_BLACK_DRAKONID:
                 case NPC_BLUE_DRAKONID:
                 case NPC_BRONZE_DRAKONID:
                 case NPC_CHROMATIC_DRAKONID:
                 case NPC_GREEN_DRAKONID:
                 case NPC_RED_DRAKONID:
-                    if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                    if (Creature* nefarius = GetCreature(DATA_LORD_VICTOR_NEFARIUS))
                     {
                         if (CreatureAI* nefariusAI = nefarius->AI())
                         {
                             nefariusAI->JustSummoned(creature);
                         }
-                    }
-                    if (creature->AI())
-                    {
-                        creature->AI()->DoZoneInCombat();
                     }
                     break;
                 default:
@@ -369,8 +363,6 @@ public:
             {
                 case DATA_RAZORGORE_THE_UNTAMED:
                     return razorgoreGUID;
-                case DATA_LORD_VICTOR_NEFARIUS:
-                    return victorNefariusGUID;
                 case DATA_CHROMAGGUS:
                     return chromaggusGUID;
                 case DATA_GO_CHROMAGGUS_DOOR:
@@ -380,18 +372,6 @@ public:
             }
 
             return ObjectGuid::Empty;
-        }
-
-        void SetGuidData(uint32 type, ObjectGuid data) override
-        {
-            switch (type)
-            {
-                case DATA_LORD_VICTOR_NEFARIUS:
-                    victorNefariusGUID = data;
-                    break;
-                default:
-                    break;
-            }
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -413,23 +393,11 @@ public:
                         summon->SetStandState(UNIT_STAND_STATE_DEAD);
                         summon->SetHomePosition(summon->GetPosition());
 
-                        if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                        if (Creature* nefarius = GetCreature(DATA_LORD_VICTOR_NEFARIUS))
                         {
                             if (nefarius->AI())
                             {
                                 nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
-                            }
-                        }
-                        else // Something happened, try another way
-                        {
-                            if (Creature* nefarius = summon->FindNearestCreature(NPC_VICTOR_NEFARIUS, 500.f, true))
-                            {
-                                victorNefariusGUID = nefarius->GetGUID();
-
-                                if (nefarius->AI())
-                                {
-                                    nefarius->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
-                                }
                             }
                         }
                     }
@@ -514,7 +482,7 @@ public:
                             razor->AI()->DoAction(ACTION_PHASE_TWO);
                         break;
                     case EVENT_RESPAWN_NEFARIUS:
-                        if (Creature* nefarius = instance->GetCreature(victorNefariusGUID))
+                        if (Creature* nefarius = GetCreature(DATA_LORD_VICTOR_NEFARIUS))
                         {
                             nefarius->SetPhaseMask(1, true);
                             nefarius->setActive(true);
@@ -580,7 +548,6 @@ public:
         ObjectGuid chromaggusDoorGUID;
         ObjectGuid nefarianGUID;
         ObjectGuid nefarianDoorGUID;
-        ObjectGuid victorNefariusGUID;
 
         // Razorgore
         uint8 EggCount;
@@ -644,8 +611,33 @@ public:
     }
 };
 
+enum orb_of_command_misc
+{
+    QUEST_BLACKHANDS_COMMAND = 7761,
+    MAP_BWL                  = 469
+};
+
+const Position orbOfCommandTP = { -7672.46f, -1107.19f, 396.65f, 0.59f };
+
+class at_orb_of_command : public AreaTriggerScript
+{
+public:
+    at_orb_of_command() : AreaTriggerScript("at_orb_of_command") { }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    {
+        if (!player->IsAlive() && player->GetQuestRewardStatus(QUEST_BLACKHANDS_COMMAND))
+        {
+            player->TeleportTo(MAP_BWL, orbOfCommandTP.m_positionX, orbOfCommandTP.m_positionY, orbOfCommandTP.m_positionZ, orbOfCommandTP.m_orientation);
+            return true;
+        }
+        return false;
+    }
+};
+
 void AddSC_instance_blackwing_lair()
 {
     new instance_blackwing_lair();
     new spell_bwl_shadowflame();
+    new at_orb_of_command();
 }
