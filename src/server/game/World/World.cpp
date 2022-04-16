@@ -1415,6 +1415,12 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_BG_REWARD_LOSER_HONOR_FIRST]  = sConfigMgr->GetOption<int32>("Battleground.RewardLoserHonorFirst", 5);
     m_int_configs[CONFIG_BG_REWARD_LOSER_HONOR_LAST]   = sConfigMgr->GetOption<int32>("Battleground.RewardLoserHonorLast", 5);
 
+    // rank system
+    m_bool_configs[CONFIG_RANK_SYSTEM_WIN_ENABLE]      = sConfigMgr->GetOption<bool>("RankSystem.RewardWinArenaEnable", true);
+    m_int_configs[CONFIG_RANK_SYSTEM_WIN_RATE_ARENA]   = sConfigMgr->GetOption<int32>("RankSystem.RewardWinArena", 25);
+    m_int_configs[CONFIG_RANK_SYSTEM_WIN_RATE_BG]      = sConfigMgr->GetOption<int32>("RankSystem.RewardWinBG", 150);
+    m_int_configs[CONFIG_RANK_SYSTEM_KILL_RATE_BG]     = sConfigMgr->GetOption<int32>("RankSystem.RewardKillBG", 10);
+
     m_int_configs[CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER] = sConfigMgr->GetOption<int32>("WaypointMovementStopTimeForPlayer", 120);
 
     m_int_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PRINT_MODE]              = sConfigMgr->GetOption<int32>("DungeonAccessRequirements.PrintMode", 1);

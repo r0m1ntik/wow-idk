@@ -30,6 +30,7 @@ void AddSC_CustomTeleportOrCommand();
 void AddSC_TemplateNPC();
 void AddSC_npc_1v1arena();
 void AddSC_DeathMatchkill();
+void AddSC_NPC_RANK_VENDOR();
 
 void AddCustomScripts()
 {
@@ -42,4 +43,5 @@ void AddCustomScripts()
     AddSC_TemplateNPC();
     AddSC_npc_1v1arena();
     AddSC_DeathMatchkill();
+    AddSC_NPC_RANK_VENDOR();
 }

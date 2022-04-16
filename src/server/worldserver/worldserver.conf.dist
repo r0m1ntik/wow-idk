@@ -3715,6 +3715,17 @@ LFG.MaxKickCount = 2
 LFG.KickPreventionTimer = 900
 
 #
+#      RankSystemConfig
+#        Description: Управление рейтингом выдачи опыта для ранга
+#        Default:     Все включено и настроена по дефольту
+
+# Арена & Бг
+RankSystem.RewardWinArenaEnable = 1
+RankSystem.RewardWinArena = 25
+RankSystem.RewardWinBG = 150
+RankSystem.RewardKillBG = 10
+
+#
 #     EnablePlayerSettings
 #        Description: Enables the usage of character specific settings.
 #        Default:     0 - Disabled
