@@ -23,6 +23,7 @@
 #include "CellImpl.h"
 #include "Common.h"
 #include "ConditionMgr.h"
+#include "DeathMatch.h"
 #include "DisableMgr.h"
 #include "DynamicObject.h"
 #include "GameObjectAI.h"
@@ -6481,7 +6482,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     {
                         Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(m_originalCaster->GetZoneId());
                         if (AreaTableEntry const* pArea = sAreaTableStore.LookupEntry(m_originalCaster->GetAreaId()))
-                            if ((pArea->flags & AREA_FLAG_NO_FLY_ZONE) || (Bf && !Bf->CanFlyIn()))
+                            if ((pArea->flags & AREA_FLAG_NO_FLY_ZONE) || (Bf && !Bf->CanFlyIn()) || (DeathMatchMgr->IsDeathMatchZone(m_originalCaster->GetZoneId())))
                                 return SPELL_FAILED_NOT_HERE;
                     }
                     break;

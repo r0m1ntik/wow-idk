@@ -76,7 +76,7 @@
 #include "Tokenize.h"
 #include "StringConvert.h"
 #include "Translate.h"
-#define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
+ #define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
 // TODO: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1853,7 +1853,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
                 ChatHandler(GetSession()).PSendSysMessage(this->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? RU_equipe_rank : EN_equipe_rank, RankLevel);
                 return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
             }
-            
+                                    
             if (!sScriptMgr->CanEquipItem(const_cast<Player*>(this), slot, dest, pItem, swap, not_loading))
                 return EQUIP_ERR_CANT_DO_RIGHT_NOW;
 
@@ -5607,14 +5607,14 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
 
     if (m_grantableLevels > 0)
-        SetByteValue(PLAYER_FIELD_BYTES, 1, 0x01);
+        SetByteValue(PLAYER_FIELD_BYTES, 1, 0x01);       
 
     // rank system
     m_rankPoints = fields[73].Get<uint32>();
     if (m_rankPoints < 0) {
         m_rankPoints = 0;
-    }        
-
+    }
+    
     _LoadDeclinedNames(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES));
 
     //m_achievementMgr->CheckAllAchievementCriteria(); // pussywizard: disabled this
