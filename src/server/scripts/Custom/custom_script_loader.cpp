@@ -31,6 +31,7 @@ void AddSC_TemplateNPC();
 void AddSC_npc_1v1arena();
 void AddSC_DeathMatchkill();
 void AddSC_NPC_RANK_VENDOR();
+void AddSC_ServerMenuPlayerGossip();
 
 void AddCustomScripts()
 {
@@ -44,4 +45,5 @@ void AddCustomScripts()
     AddSC_npc_1v1arena();
     AddSC_DeathMatchkill();
     AddSC_NPC_RANK_VENDOR();
+    AddSC_ServerMenuPlayerGossip();
 }
