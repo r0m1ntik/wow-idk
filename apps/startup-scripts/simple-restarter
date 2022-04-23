@@ -30,13 +30,13 @@ do
 
     cd "$bin_path";
 
-    if [ "$with_gdb" = true ]; then
-        echo "Running with GDB enabled"
-        gdb -x "$CURRENT_PATH/gdb.conf" --batch "./$bin_file"
-    else
-        echo "Running without GDB"
-        "./$bin_file"
-    fi
+    # if [ "$with_gdb" = true ]; then
+    echo "Running with GDB enabled"
+    gdb -x "$CURRENT_PATH/gdb.conf" --batch "./$bin_file"
+    # else
+    #     echo "Running without GDB"
+    #     "./$bin_file"
+    # fi
 
     _exit_code=$?
 

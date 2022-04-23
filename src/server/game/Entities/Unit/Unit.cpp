@@ -8393,8 +8393,10 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                     int32 basepoints = int32(float(damage) / 12.0f);
                     // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
                     if (AuraEffect const* aurEffect = GetAuraEffect(67191, EFFECT_0))
-                    AddPct(basepoints, aurEffect->GetAmount());
-                    CastCustomSpell(victim, 66922, &basepoints, nullptr, nullptr, true, 0);
+                        AddPct(basepoints, aurEffect->GetAmount());
+
+                    if (victim->HasAura(53601))    
+                        CastCustomSpell(victim, 66922, &basepoints, nullptr, nullptr, true, 0);
                     return true;
                 } // added for flash of light with sacred shield.
 
@@ -8402,7 +8404,6 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                 if (procSpell && dummySpell->SpellIconID == 3021)
                 {
                     if (procSpell->SpellFamilyName == SPELLFAMILY_PALADIN && GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
-                    //if (true)
                     {
                         int32 basepoints = int32(float(damage) / 12.0f);
                         // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
@@ -8973,7 +8974,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
     // All ok. Check current trigger spell
     SpellInfo const* triggerEntry = sSpellMgr->GetSpellInfo(trigger_spell_id);
-    if (!triggerEntry)
+    if (triggerEntry == nullptr)
     {
         // Don't cast unknown spell
         // LOG_ERROR("entities.unit", "Unit::HandleProcTriggerSpell: Spell {} (effIndex: {}) has unknown TriggerSpell {}. Unhandled custom case?", auraSpellInfo->Id, triggeredByAura->GetEffIndex(), trigger_spell_id);
@@ -9416,7 +9417,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     }
 
     // try detect target manually if not set
-    if (!target)
+    if (target == nullptr)
         target = !(procFlags & (PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS)) && triggerEntry->IsPositive() ? this : victim;
 
     if (cooldown)
@@ -13856,7 +13857,6 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 if (Unit* critter = ObjectAccessor::GetUnit(*this, GetCritterGUID()))
                     critter->UpdateSpeed(mtype, forced);
             }
-            ToPlayer()->SetCanTeleport(true);
         }
 
         switch (mtype)
@@ -15791,7 +15791,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     continue;
 
                 // If not trigger by default and spellProcEvent == nullptr - skip
-                if (!isTriggerAura[aurEff->GetAuraType()] && !triggerData.spellProcEvent)
+                if (!isTriggerAura[aurEff->GetAuraType()] && triggerData.spellProcEvent == nullptr)
                     continue;
 
                 switch (aurEff->GetAuraType())
@@ -19184,7 +19184,6 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
         return;
 
     GetVehicleBase()->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, GetGUID());
-    ToPlayer()->SetCanTeleport(true);
     //! The following call would not even be executed successfully as the
     //! SPELL_AURA_CONTROL_VEHICLE unapply handler already calls _ExitVehicle without
     //! specifying an exitposition. The subsequent call below would return on if (!m_vehicle).

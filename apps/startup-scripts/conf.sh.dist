@@ -1,9 +1,9 @@
 # enable/disable GDB execution
-export GDB_ENABLED=0
+export GDB_ENABLED=1
 
 # [optional] gdb file
 # default: gdb.conf
-export GDB=""
+export GDB="gdb.conf"
 
 # directory where binary are stored
 export BINPATH=""
@@ -14,7 +14,7 @@ export SERVERPID=""
  
 # path to configuration file (including the file name)
 # ex: /home/user/azerothcore/etc/worldserver.conf
-export CONFIG=""
+export CONFIG="/home/server_test/etc/worldserver.conf"
 
 # path of log files
 # needed by restarter to store its logs
@@ -22,11 +22,11 @@ export LOGS_PATH="";
 
 # exec name
 # ex: worldserver
-export SERVERBIN=""
+export SERVERBIN="worldserver"
 
 # prefix name for log files
 # to avoid collision with other restarters
-export LOG_PREFIX_NAME=""
+export LOG_PREFIX_NAME="crash.txt"
 
 # [optional] name of screen service
 # if no specified, screen util won't be used
