@@ -1322,7 +1322,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 int32 resilienceReduction = damage;
                 if (CanApplyResilience())
                 {
-                    if (attackType != RANGED_ATTACK) 
+                    if (attackType != RANGED_ATTACK)
                     {
                         Unit::ApplyResilience(victim, nullptr, &resilienceReduction, crit, CR_CRIT_TAKEN_MELEE);
                     }
@@ -1587,7 +1587,7 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
 
     // attackType is checked already for BASE_ATTACK or OFF_ATTACK so it can't be RANGED_ATTACK here
     int32 dmg = damageInfo->damage;
-    int32 cleanDamage = damageInfo->cleanDamage;    
+    int32 cleanDamage = damageInfo->cleanDamage;
     if (CanApplyResilience())
     {
         int32 resilienceReduction = dmg;

@@ -6354,7 +6354,6 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
 
     int32 dmg = damage;
     int32 mitigatedDamage = cleanDamage.mitigated_damage;
-
     if (CanApplyResilience())
     {
         int32 resilienceReduction = dmg;
@@ -6366,7 +6365,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     }
 
     damage = std::max(0, dmg);
-    cleanDamage.mitigated_damage = std::max(0, mitigatedDamage);    
+    cleanDamage.mitigated_damage = std::max(0, mitigatedDamage);
 
     DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, cleanDamage.mitigated_damage);
     Unit::CalcAbsorbResist(dmgInfo);
@@ -6452,7 +6451,7 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     }
 
     damage = std::max(0, dmg);
-    cleanDamage.mitigated_damage = std::max(0, cleanDamageAmount);    
+    cleanDamage.mitigated_damage = std::max(0, cleanDamageAmount);
 
     DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, cleanDamage.mitigated_damage);
     Unit::CalcAbsorbResist(dmgInfo);
