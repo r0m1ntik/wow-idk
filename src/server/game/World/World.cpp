@@ -124,6 +124,7 @@ World::World()
     m_PlayerCount = 0;
     m_MaxPlayerCount = 0;
     m_NextDailyQuestReset = 0s;
+    m_NextDailyArenaCapReset = 0s;
     m_NextWeeklyQuestReset = 0s;
     m_NextMonthlyQuestReset = 0s;
     m_NextRandomBGReset = 0s;
@@ -1425,6 +1426,9 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_RANK_SYSTEM_WIN_RATE_BG]      = sConfigMgr->GetOption<int32>("RankSystem.RewardWinBG", 150);
     m_int_configs[CONFIG_RANK_SYSTEM_KILL_RATE_BG]     = sConfigMgr->GetOption<int32>("RankSystem.RewardKillBG", 10);
 
+    // arena cap today
+    m_int_configs[CONFIG_ARENA_CAP_PER_DAYS]           = sConfigMgr->GetOption<int32>("Arena.CapPerDay", 400);
+
     m_int_configs[CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER] = sConfigMgr->GetOption<int32>("WaypointMovementStopTimeForPlayer", 120);
 
     m_int_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PRINT_MODE]              = sConfigMgr->GetOption<int32>("DungeonAccessRequirements.PrintMode", 1);
@@ -2090,6 +2094,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Calculate next daily quest reset time...");
     InitDailyQuestResetTime();
 
+    LOG_INFO("server.loading", "Calculate next daily arena cap reset time...");
+    InitDailyArenaCapResetTime();    
+
     LOG_INFO("server.loading", "Calculate next weekly quest reset time..." );
     InitWeeklyQuestResetTime();
 
@@ -2288,6 +2295,11 @@ void World::Update(uint32 diff)
         if (currentGameTime > m_NextDailyQuestReset)
         {
             ResetDailyQuests();
+        }
+
+        if (currentGameTime > m_NextDailyArenaCapReset)
+        {
+            ResetDailyArenaCap();
         }
 
         /// Handle weekly quests reset time
@@ -3088,6 +3100,17 @@ void World::InitDailyQuestResetTime()
     }
 }
 
+void World::InitDailyArenaCapResetTime()
+{
+    Seconds wstime = Seconds(sWorld->getWorldState(WS_DAYLY_ARENA_POINTS_CAP));
+    m_NextDailyArenaCapReset = wstime > 0s ? wstime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
+
+    if (wstime == 0s)
+    {
+        sWorld->setWorldState(WS_DAYLY_ARENA_POINTS_CAP, m_NextDailyArenaCapReset.count());
+    }    
+}
+
 void World::InitMonthlyQuestResetTime()
 {
     Seconds wstime = Seconds(sWorld->getWorldState(WS_MONTHLY_QUEST_RESET_TIME));
@@ -3157,6 +3180,19 @@ void World::ResetDailyQuests()
 
     // change available dailies
     sPoolMgr->ChangeDailyQuests();
+}
+
+void World::ResetDailyArenaCap()
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_CAP_DAILY);
+    CharacterDatabase.Execute(stmt);
+
+    for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+        if (itr->second->GetPlayer())
+            itr->second->GetPlayer()->ResetDailyArenaCapStatus();
+
+    m_NextDailyArenaCapReset = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
+    sWorld->setWorldState(WS_DAYLY_ARENA_POINTS_CAP, m_NextDailyArenaCapReset.count());
 }
 
 void World::LoadDBAllowedSecurityLevel()
