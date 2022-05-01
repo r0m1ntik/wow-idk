@@ -4852,6 +4852,14 @@ void Player::RepopAtGraveyard()
         TeleportTo(1, 5209.53f, -4816.09f, 702.0f, 0.55f);
         return;
     }
+    
+    if (GetAreaId() == 11)
+    {
+        ResurrectPlayer(1.0f);
+        SpawnCorpseBones();
+        TeleportTo(0, -4176.85f, -1401.07f, 200.5f, 0.03f);
+        return;
+    }
 
     // stop countdown until repop
     m_deathTimer = 0;
