@@ -574,6 +574,10 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_ARENA_POINTS]                         = sConfigMgr->GetOption<float>("Rate.ArenaPoints", 1.0f);
     rate_values[RATE_INSTANCE_RESET_TIME]                  = sConfigMgr->GetOption<float>("Rate.InstanceResetTime", 1.0f);
 
+    /* Vip аккаунт */
+    rate_values[RATE_HONOR_PREMIUM]                        = sConfigMgr->GetOption<float>("Rate.Honor.Premium", 2.0f);
+    rate_values[RATE_RANK_REWARD_PREMIUM]                  = sConfigMgr->GetOption<float>("Rate.Rank.Premium", 2.0f);
+
     rate_values[RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE]       = sConfigMgr->GetOption<float>("Rate.MissChanceMultiplier.TargetCreature", 11.0f);
     rate_values[RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER]         = sConfigMgr->GetOption<float>("Rate.MissChanceMultiplier.TargetPlayer", 7.0f);
     m_bool_configs[CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS] = sConfigMgr->GetOption<bool>("Rate.MissChanceMultiplier.OnlyAffectsPlayer", false);

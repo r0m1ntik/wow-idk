@@ -247,6 +247,7 @@ struct AuthSession
     uint64 DosResponse = 0;
     Acore::Crypto::SHA1::Digest Digest = {};
     std::string Account;
+    bool isPremium = false;
     ByteBuffer AddonInfo;
 };
 
@@ -576,6 +577,15 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
+    // Vip аккаунт
+    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PREMIUM);
+    stmt->SetData(0, account.Id);
+    PreparedQueryResult resultPremium = LoginDatabase.Query(stmt);
+
+    if (resultPremium) {
+        authSession->isPremium = true;
+    }
+
     // Check locked state for server
     AccountTypes allowedAccountType = sWorld->GetPlayerSecurityLimit();
     LOG_DEBUG("network", "Allowed Level: {} Player Level {}", allowedAccountType, account.Security);
@@ -604,7 +614,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     sScriptMgr->OnLastIpUpdate(account.Id, address);
 
-    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
+    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security, authSession->isPremium,
         account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime, account.Bonuses);
 
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
