@@ -1877,10 +1877,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
 {
     // check if this group is LFG group
     if (isLFGGroup())
-        return ERR_LFG_CANT_USE_BATTLEGROUND;   
-
-    if(!isRated)
-        return ERR_BATTLEGROUND_JOIN_FAILED; 
+        return ERR_LFG_CANT_USE_BATTLEGROUND;
 
     BattlemasterListEntry const* bgEntry = sBattlemasterListStore.LookupEntry(bgTemplate->GetBgTypeID());
     if (!bgEntry)
