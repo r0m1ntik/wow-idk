@@ -831,12 +831,7 @@ void Group::Disband(bool hideDestroy /* = false */)
     }
 
     // Cleaning up instance saved data for gameobjects when a group is disbanded
-    if (instanceId)
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
-        stmt->SetData(0, instanceId);
-        CharacterDatabase.Execute(stmt);
-    }
+    sInstanceSaveMgr->DeleteInstanceSavedData(instanceId);
 
     sGroupMgr->RemoveGroup(this);
     delete this;
@@ -2048,16 +2043,6 @@ void Group::SetRaidDifficulty(Difficulty difficulty)
     }
 }
 
-void Group::ResetInstanceSavedGameobjects(uint32 instanceId)
-{
-    if (instanceId)
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DELETE_INSTANCE_SAVED_DATA);
-        stmt->SetData(0, instanceId);
-        CharacterDatabase.Execute(stmt);
-    }
-}
-
 void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
 {
     if (isBGGroup() || isBFGroup() || isLFGGroup())
@@ -2089,7 +2074,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
                     }
 
-                    ResetInstanceSavedGameobjects(instanceSave->GetInstanceId());
+                    sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->UnbindAllFor(*itr);
@@ -2117,7 +2102,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                         leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
                     }
 
-                    ResetInstanceSavedGameobjects(instanceSave->GetInstanceId());
+                    sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
                 }
                 for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
                     sInstanceSaveMgr->UnbindAllFor(*itr);
