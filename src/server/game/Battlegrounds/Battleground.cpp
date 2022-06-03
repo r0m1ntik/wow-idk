@@ -1251,6 +1251,7 @@ void Battleground::AddPlayer(Player* player)
     sBattlegroundMgr->BuildPlayerJoinedBattlegroundPacket(&data, player);
     SendPacketToTeam(teamId, &data, player, false);
 
+    player->Dismount();
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
     // add arena specific auras
