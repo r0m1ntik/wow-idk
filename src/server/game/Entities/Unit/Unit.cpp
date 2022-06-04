@@ -8324,7 +8324,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
 // Used in case when access to whole aura is needed
 // All procs should be handled like this...
-bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, SpellInfo const*  procSpell, uint32 /*procFlag*/, uint32 procEx, uint32  /*cooldown*/, bool* handled)
+bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, SpellInfo const*  /*procSpell*/, uint32 /*procFlag*/, uint32 procEx, uint32  /*cooldown*/, bool* handled)
 {
     SpellInfo const* dummySpell = triggeredByAura->GetSpellInfo();
 
@@ -8418,37 +8418,6 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
                             CastCustomSpell(this, 67545, &bp0, nullptr, nullptr, true, nullptr, triggeredByAura->GetEffect(EFFECT_0), GetGUID());
                             return true;
                         }
-                }
-                break;
-            }
-        case SPELLFAMILY_PALADIN:
-            {
-                //Flash of Light
-                if (procSpell && dummySpell->SpellIconID == 241)
-                {
-                    int32 basepoints = int32(float(damage) / 12.0f);
-                    // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
-                    if (AuraEffect const* aurEffect = GetAuraEffect(67191, EFFECT_0))
-                        AddPct(basepoints, aurEffect->GetAmount());
-
-                    if (victim->HasAura(53601))    
-                        CastCustomSpell(victim, 66922, &basepoints, nullptr, nullptr, true, 0);
-                    return true;
-                } // added for flash of light with sacred shield.
-
-                // Infusion of Light
-                if (procSpell && dummySpell->SpellIconID == 3021)
-                {
-                    if (procSpell->SpellFamilyName == SPELLFAMILY_PALADIN && GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
-                    {
-                        int32 basepoints = int32(float(damage) / 12.0f);
-                        // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
-                        if (AuraEffect const* aurEffect = GetAuraEffect(67191, EFFECT_0))
-                            AddPct(basepoints, aurEffect->GetAmount());
-
-                    }
-                    else if ((procSpell->SpellFamilyFlags[0] & 0x200000 || procSpell->SpellFamilyFlags[1] & 0x10000) && !(procEx & PROC_EX_CRITICAL_HIT))
-                        *handled = true;
                 }
                 break;
             }    
