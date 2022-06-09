@@ -1257,9 +1257,11 @@ void Battleground::AddPlayer(Player* player)
     if (isArena())
     {
         // restore pets health before remove
-        if (Pet* pet = player->GetPet())
-            if (pet->IsAlive())
+        if (Pet* pet = player->GetPet()) {
+            if (pet->IsAlive()) {
                 pet->SetHealth(pet->GetMaxHealth());
+            }
+        }
 
         player->RemoveArenaEnchantments(TEMP_ENCHANTMENT_SLOT);
         player->DestroyConjuredItems(true);
