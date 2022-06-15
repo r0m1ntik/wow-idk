@@ -421,21 +421,60 @@ class spell_dk_bloodworms : public SpellScript
 };
 
 // 49206 - Summon Gargoyle
-class spell_dk_summon_gargoyle : public SpellScript
+class spell_dk_summon_gargoyle : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_dk_summon_gargoyle);
+    public:
+        spell_dk_summon_gargoyle() : SpellScriptLoader("spell_dk_summon_gargoyle") { }
 
-    void SetDest(SpellDestination& dest)
-    {
-        // Adjust effect summon position
-        if (GetCaster()->IsWithinLOS(dest._position.GetPositionX(), dest._position.GetPositionY(), dest._position.GetPositionZ() + 15.0f))
-            dest._position.m_positionZ += 15.0f;
-    }
+        class spell_dk_summon_gargoyle_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_summon_gargoyle_SpellScript);
 
-    void Register() override
-    {
-        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_dk_summon_gargoyle::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT_LEFT);
-    }
+            bool Load()
+            {
+                offset.m_positionX = 0.0f;
+                offset.m_positionY = 0.0f;
+                offset.m_positionZ = 7.0f;
+                offset.m_orientation = 0.0f;
+                return true;
+            }
+
+            void HandleHitTarget(SpellEffIndex /*effIndex*/)
+            {
+                WorldLocation summonPos = *GetExplTargetDest();
+                summonPos.RelocateOffset(offset);
+                SetExplTargetDest(summonPos);
+                GetHitDest()->RelocateOffset(offset);
+            }
+
+            void HandleLaunchTarget(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* target = GetExplTargetUnit())
+                {
+                    if (!GetCaster()->isInFront(target, 2.5f) && GetCaster()->IsWithinMeleeRange(target))
+                    {
+                        float o = GetCaster()->GetOrientation();
+                        offset.m_positionX = (7 * cos(o)) + target->GetMeleeReach();
+                        offset.m_positionY = (7 * sin(o)) + target->GetMeleeReach();
+                        offset.m_positionZ = 7.0;
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_dk_summon_gargoyle_SpellScript::HandleHitTarget, EFFECT_0, SPELL_EFFECT_SUMMON);
+                OnEffectLaunchTarget += SpellEffectFn(spell_dk_summon_gargoyle_SpellScript::HandleLaunchTarget, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+            }
+
+        private:
+            Position offset;
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_summon_gargoyle_SpellScript();
+        }
 };
 
 // 63611 - Improved Blood Presence

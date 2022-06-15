@@ -57,7 +57,6 @@ public:
         {
             _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
             _despawning = false;
-            _initialSelection = true;
             _targetGUID.Clear();
         }
 
@@ -74,6 +73,7 @@ public:
         {
             ScriptedAI::InitializeAI();
             Unit* owner = me->GetOwner();
+            ObjectGuid ownerGuid = me->GetOwnerGUID();
             if (!owner)
                 return;
 
@@ -87,12 +87,26 @@ public:
                     }
                 }
 
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
+            // Find victim of Summon Gargoyle spell
+            std::list<Unit*> targets;
+            Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
+            Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+            Cell::VisitAllObjects(me, searcher, 30.0f);
+            for (Unit* target : targets)
+            {
+                if (target->HasAura(SPELL_DK_SUMMON_GARGOYLE_1, ownerGuid))
+                {
+                    me->Attack(target, false);
+                    break;
+                }
+            }   
 
-            float tz = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
-            me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
-            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+            // me->SetCanFly(true);
+            // me->SetDisableGravity(true);
+
+            // float tz = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
+            // me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
+            // me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             _selectionTimer = 2000;
             _initialCastTimer = 0;
         }
@@ -123,7 +137,7 @@ public:
         {
             RemoveTargetAura();
             _targetGUID = who->GetGUID();
-            me->AddAura(SPELL_DK_SUMMON_GARGOYLE_1, who);
+            // me->AddAura(SPELL_DK_SUMMON_GARGOYLE_1, who);
             ScriptedAI::AttackStart(who);
         }
 
@@ -153,15 +167,15 @@ public:
             me->CastSpell(me, SPELL_DK_SANCTUARY, true);
             me->SetReactState(REACT_PASSIVE);
 
-            me->SetSpeed(MOVE_FLIGHT, 1.0f, true);
-            me->SetSpeed(MOVE_RUN, 1.0f, true);
+            me->SetSpeed(MOVE_FLIGHT, 0.75f, true);
+            me->SetSpeed(MOVE_RUN, 0.75f, true);
             float x = me->GetPositionX() + 20 * cos(me->GetOrientation());
             float y = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
             float z = me->GetPositionZ() + 40;
             me->DisableSpline();
             me->GetMotionMaster()->Clear(false);
 
-            me->GetMotionMaster()->MoveCharge(x, y, z, 7.0f, 1);
+            me->GetMotionMaster()->MovePoint(0, x, y, z);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
 
@@ -170,23 +184,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (_initialSelection)
-            {
-                _initialSelection = false;
-                // Find victim of Summon Gargoyle spell
-                std::list<Unit*> targets;
-                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50.0f);
-                Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-                Cell::VisitAllObjects(me, searcher, 50.0f);
-                for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                    if ((*iter)->GetAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID()))
-                    {
-                        (*iter)->RemoveAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID());
-                        SetGazeOn(*iter);
-                        _targetGUID = (*iter)->GetGUID();
-                        break;
-                    }
-            }
             if (_despawnTimer > 4000)
             {
                 _despawnTimer -= diff;
@@ -224,7 +221,6 @@ public:
         uint32 _selectionTimer;
         uint32 _initialCastTimer;
         bool _despawning;
-        bool _initialSelection;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
