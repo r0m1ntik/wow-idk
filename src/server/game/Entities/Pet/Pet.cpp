@@ -1311,6 +1311,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             {
                                 float bonus = pSummoner->GetRatingBonusValue(CR_HASTE_MELEE);
                                 bonus += pSummoner->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
+                                bonus += pSummoner->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
                                 SetFloatValue(UNIT_MOD_CAST_SPEED, (1.0f - (bonus / 100) < 0.25f ? 0.25f : 1.0f - (bonus / 100)));
                             }
 

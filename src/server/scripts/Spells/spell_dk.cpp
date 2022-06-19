@@ -421,60 +421,49 @@ class spell_dk_bloodworms : public SpellScript
 };
 
 // 49206 - Summon Gargoyle
-class spell_dk_summon_gargoyle : public SpellScriptLoader
+class spell_dk_summon_gargoyle : public SpellScript
 {
-    public:
-        spell_dk_summon_gargoyle() : SpellScriptLoader("spell_dk_summon_gargoyle") { }
+    PrepareSpellScript(spell_dk_summon_gargoyle);
 
-        class spell_dk_summon_gargoyle_SpellScript : public SpellScript
+    bool Load()
+    {
+        offset.m_positionX = 0.0f;
+        offset.m_positionY = 0.0f;
+        offset.m_positionZ = 7.0f;
+        offset.m_orientation = 0.0f;
+        return true;
+    }
+
+    void HandleHitTarget(SpellEffIndex /*effIndex*/)
+    {
+        WorldLocation summonPos = *GetExplTargetDest();
+        summonPos.RelocateOffset(offset);
+        SetExplTargetDest(summonPos);
+        GetHitDest()->RelocateOffset(offset);
+    }
+
+    void HandleLaunchTarget(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetExplTargetUnit())
         {
-            PrepareSpellScript(spell_dk_summon_gargoyle_SpellScript);
-
-            bool Load()
+            if (!GetCaster()->isInFront(target, 2.5f) && GetCaster()->IsWithinMeleeRange(target))
             {
-                offset.m_positionX = 0.0f;
-                offset.m_positionY = 0.0f;
-                offset.m_positionZ = 7.0f;
-                offset.m_orientation = 0.0f;
-                return true;
+                float o = GetCaster()->GetOrientation();
+                offset.m_positionX = (7 * cos(o)) + target->GetMeleeReach();
+                offset.m_positionY = (7 * sin(o)) + target->GetMeleeReach();
+                offset.m_positionZ = 7.0;
             }
-
-            void HandleHitTarget(SpellEffIndex /*effIndex*/)
-            {
-                WorldLocation summonPos = *GetExplTargetDest();
-                summonPos.RelocateOffset(offset);
-                SetExplTargetDest(summonPos);
-                GetHitDest()->RelocateOffset(offset);
-            }
-
-            void HandleLaunchTarget(SpellEffIndex /*effIndex*/)
-            {
-                if (Unit* target = GetExplTargetUnit())
-                {
-                    if (!GetCaster()->isInFront(target, 2.5f) && GetCaster()->IsWithinMeleeRange(target))
-                    {
-                        float o = GetCaster()->GetOrientation();
-                        offset.m_positionX = (7 * cos(o)) + target->GetMeleeReach();
-                        offset.m_positionY = (7 * sin(o)) + target->GetMeleeReach();
-                        offset.m_positionZ = 7.0;
-                    }
-                }
-            }
-
-            void Register()
-            {
-                OnEffectHit += SpellEffectFn(spell_dk_summon_gargoyle_SpellScript::HandleHitTarget, EFFECT_0, SPELL_EFFECT_SUMMON);
-                OnEffectLaunchTarget += SpellEffectFn(spell_dk_summon_gargoyle_SpellScript::HandleLaunchTarget, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
-            }
-
-        private:
-            Position offset;
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_dk_summon_gargoyle_SpellScript();
         }
+    }
+
+    void Register()
+    {
+        OnEffectHit += SpellEffectFn(spell_dk_summon_gargoyle::HandleHitTarget, EFFECT_0, SPELL_EFFECT_SUMMON);
+        OnEffectLaunchTarget += SpellEffectFn(spell_dk_summon_gargoyle::HandleLaunchTarget, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+    }
+
+    private:
+        Position offset;
 };
 
 // 63611 - Improved Blood Presence
@@ -762,7 +751,7 @@ class spell_dk_pet_scaling : public AuraScript
             // xinef: ebon garogyle - inherit 30% of stamina
             if (GetUnitOwner()->GetEntry() == NPC_EBON_GARGOYLE && stat == STAT_STAMINA)
                 if (Unit* owner = unitOwner->GetCharmerOrOwner())
-                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 60);
             return;
         }
 
