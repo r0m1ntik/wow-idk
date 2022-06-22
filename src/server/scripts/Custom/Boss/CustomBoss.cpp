@@ -1047,6 +1047,7 @@ class event_mage_fire : public CreatureScript
             uint32 m_uiFireNovaTimer;
 	        uint32 m_uiShipTimer;
             uint32 m_uiFeerTimer;
+            bool done = false;
 
             void Reset() override
             {
@@ -1059,6 +1060,8 @@ class event_mage_fire : public CreatureScript
 
             void JustSummoned(Creature* /*summon*/) override
             {
+                if (me->GetHealth() != 5000000)
+                    me->SetHealth(5000000);  
             }
 
             void EnterCombat(Unit* /*pWho*/) override
@@ -1098,6 +1101,17 @@ class event_mage_fire : public CreatureScript
                 }
             }
 
+            void HealReceived(Unit* /*healer*/, uint32& heal) override
+            {
+                if (me->HealthAbovePctHealed(100, heal) && !done) {
+                    done = !done;
+                    for (int i = 0; i < 5; i++) {
+                        DoCast(me, 62519);
+                        DoCast(me, 66721);
+                    }
+                }
+            }
+
             void RewarBossKill(Creature* killer, bool alliance)
             {
                 SessionMap const& sessions = sWorld->GetAllSessions();
@@ -1121,7 +1135,7 @@ class event_mage_fire : public CreatureScript
                     return;
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
+                    return;                  
 
                 //Chain heal Timer
                 if (m_uiHealTimer <= uiDiff)
