@@ -178,6 +178,15 @@ WorldSession::~WorldSession()
         LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
 }
 
+void WorldSession::SetBonuses(uint32 Bonuses)
+{
+    m_bonuses = Bonuses;
+    LoginDatabasePreparedStatement* tm = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_BONUSES);
+    tm->SetData(0, Bonuses);
+    tm->SetData(1, GetAccountId());
+    LoginDatabase.Execute(tm);    
+}
+
 std::string const& WorldSession::GetPlayerName() const
 {
     return _player ? _player->GetName() : DefaultPlayerName;
