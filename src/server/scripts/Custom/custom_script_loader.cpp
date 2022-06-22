@@ -33,6 +33,7 @@ void AddSC_DeathMatchkill();
 void AddSC_NPC_RANK_VENDOR();
 void AddSC_ServerMenuPlayerGossip();
 void AddSC_npc_custom_boss();
+void AddSC_RewardRangKillBoss();
 
 void AddCustomScripts()
 {
@@ -48,4 +49,5 @@ void AddCustomScripts()
     AddSC_NPC_RANK_VENDOR();
     AddSC_ServerMenuPlayerGossip();
     AddSC_npc_custom_boss();
+    AddSC_RewardRangKillBoss();
 }
