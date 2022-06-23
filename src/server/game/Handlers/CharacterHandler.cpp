@@ -2289,7 +2289,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             }
 
             // Leave Arena Teams
-            Player::LeaveAllArenaTeams(factionChangeInfo->Guid);
+            // Player::LeaveAllArenaTeams(factionChangeInfo->Guid);
 
             // Reset homebind and position
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
