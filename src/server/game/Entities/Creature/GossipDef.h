@@ -213,11 +213,15 @@ public:
         return _menuItems;
     }
 
+    void SetSenderGUID(ObjectGuid guid) { _senderGUID = guid; }
+    [[nodiscard]] ObjectGuid GetSenderGUID() const { return _senderGUID; }
+
 private:
     GossipMenuItemContainer _menuItems;
     GossipMenuItemDataContainer _menuItemData;
     uint32 _menuId;
     LocaleConstant _locale;
+    ObjectGuid _senderGUID;
 };
 
 class QuestMenu
