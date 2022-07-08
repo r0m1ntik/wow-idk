@@ -212,7 +212,7 @@ void PlayerMenu::SendGossipMenu(std::string text, ObjectGuid objectGuid, uint32 
 	SendGossipMenu(textid, objectGuid);
 }
 
-void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID) const
+void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
 {
     _gossipMenu.SetSenderGUID(objectGUID);
 
