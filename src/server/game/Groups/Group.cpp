@@ -1017,7 +1017,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
                     continue;
                 if (member->IsAtLootRewardDistance(pLootedObject))
                 {
-                    if (i->AllowedForPlayer(member))
+                    if (i->AllowedForPlayer(member, loot->sourceWorldObjectGUID))
                     {
                         r->totalPlayersRolling++;
 
@@ -1101,7 +1101,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
 
             if (member->IsAtLootRewardDistance(pLootedObject))
             {
-                if (i->AllowedForPlayer(member))
+                if (i->AllowedForPlayer(member, loot->sourceWorldObjectGUID))
                 {
                     r->totalPlayersRolling++;
                     r->playerVote[member->GetGUID()] = NOT_EMITED_YET;
@@ -1159,7 +1159,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                 if (!playerToRoll)
                     continue;
 
-                if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtLootRewardDistance(lootedObject))
+                if (i->AllowedForPlayer(playerToRoll, loot->sourceWorldObjectGUID) && playerToRoll->IsAtLootRewardDistance(lootedObject))
                 {
                     r->totalPlayersRolling++;
                     if (playerToRoll->GetPassOnGroupLoot())
@@ -1233,7 +1233,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
             if (!playerToRoll)
                 continue;
 
-            if (i->AllowedForPlayer(playerToRoll) && playerToRoll->IsAtLootRewardDistance(lootedObject))
+            if (i->AllowedForPlayer(playerToRoll, loot->sourceWorldObjectGUID) && playerToRoll->IsAtLootRewardDistance(lootedObject))
             {
                 r->totalPlayersRolling++;
                 r->playerVote[playerToRoll->GetGUID()] = NOT_EMITED_YET;
