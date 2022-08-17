@@ -132,6 +132,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
     _calendarEventCreationCooldown(0),
+    _addonMessageReceiveCount(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
     _pendingTimeSyncRequests()
@@ -457,6 +458,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
 
     METRIC_VALUE("processed_packets", processedPackets);
+    METRIC_VALUE("addon_messages", _addonMessageReceiveCount.load());
+    _addonMessageReceiveCount = 0;
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
     {
