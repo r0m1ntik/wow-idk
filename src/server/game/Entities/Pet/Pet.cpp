@@ -433,8 +433,12 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
             _LoadSpellCooldowns(holder.GetPreparedResult(PetLoadQueryHolder::COOLDOWNS));
             LearnPetPassives();
             InitLevelupSpellsForLevel();
-            if (GetMap()->IsBattleArena())
+            if (GetMap()->IsBattleArena()) {
                 RemoveArenaAuras();
+                if (getPowerType() == POWER_MANA)
+                    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));                
+                SetHealth(GetMaxHealth());
+            }
 
             CastPetAuras(current);
         }
