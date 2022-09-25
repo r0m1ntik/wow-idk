@@ -60,15 +60,6 @@ public:
             _targetGUID.Clear();
         }
 
-        void MovementInform(uint32 type, uint32 point) override
-        {
-            if (type == POINT_MOTION_TYPE && point == 1)
-            {
-                me->SetCanFly(false);
-                me->SetDisableGravity(false);
-            }
-        }
-
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
@@ -87,6 +78,13 @@ public:
                     }
                 }
 
+            me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
+            StartSummon(owner);
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+            _selectionTimer = 2000;
+            _initialCastTimer = 0;
+
+
             // Find victim of Summon Gargoyle spell
             std::list<Unit*> targets;
             Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
@@ -100,15 +98,6 @@ public:
                     break;
                 }
             }   
-
-            // me->SetCanFly(true);
-            // me->SetDisableGravity(true);
-
-            // float tz = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
-            // me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
-            // me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-            _selectionTimer = 2000;
-            _initialCastTimer = 0;
         }
 
         void MySelectNextTarget()
@@ -154,6 +143,19 @@ public:
             MySelectNextTarget();
         }
 
+        void StartSummon(Unit* owner)
+        {
+            float x = owner->GetPositionX();
+            float y = owner->GetPositionY();
+            float z = owner->GetPositionZ() + 1;
+            
+            me->DisableSpline();
+            me->GetMotionMaster()->Clear(false);
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+            me->GetMotionMaster()->MovePoint(0, x, y, z);
+        }
+
         // Fly away when dismissed
         void FlyAway()
         {
@@ -174,11 +176,9 @@ public:
             float z = me->GetPositionZ() + 40;
             me->DisableSpline();
             me->GetMotionMaster()->Clear(false);
-
-            me->GetMotionMaster()->MovePoint(0, x, y, z);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-
+            me->GetMotionMaster()->MovePoint(0, x, y, z);
             _despawning = true;
         }
 
@@ -200,8 +200,11 @@ public:
                     MySelectNextTarget();
                     _selectionTimer = 0;
                 }
-                if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+                if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE) {
+                    if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->CastSpell(me->GetVictim(), 51963, false);
+                }
             }
             else
             {
