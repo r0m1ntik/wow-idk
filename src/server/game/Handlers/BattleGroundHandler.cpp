@@ -187,6 +187,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         {
             err = ERR_BATTLEGROUND_NONE;
         }
+        else if (!_player->GetBGAccessByLevel(bgTypeId))
+        {
+            err = ERR_BATTLEGROUND_NONE;
+        }
 
         if (err <= 0)
         {
@@ -236,6 +240,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             {
                 err = ERR_BATTLEGROUND_NONE;
             }
+            else if (!member->GetBGAccessByLevel(bgTypeId))
+            {
+                err = ERR_BATTLEGROUND_JOIN_TIMED_OUT;
+            }
+
             if (err < 0)
             {
                 return;
