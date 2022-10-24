@@ -5540,6 +5540,11 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
         ExecuteLogEffectSummonObject(effIndex, linkedTrap);
     }
+
+    if (Player* player = m_caster->ToPlayer())
+    {
+        player->SetCanTeleport(true);
+    }
 }
 
 void Spell::EffectProspecting(SpellEffIndex /*effIndex*/)
