@@ -2602,6 +2602,8 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
             stmt->SetData(1, ss.str());
             CharacterDatabase.Execute(stmt);
         }
+
+        sScriptMgr->OnStoreNewItem(this, pItem, count);
     }
     return pItem;
 }
