@@ -10288,6 +10288,8 @@ void Player::ContinueTaxiFlight()
         RemoveAurasByType(SPELL_AURA_MOUNTED);
     }
 
+    SetCanTeleport(true);
+
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
 }
 
