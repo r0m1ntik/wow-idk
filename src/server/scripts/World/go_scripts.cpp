@@ -1953,7 +1953,7 @@ public:
         sWorld->SendServerMessage(SERVER_MSG_STRING, message.c_str());
 
         // Create a vector of structs to store the loot information
-        const static std::array<Loot, 5> lootTable = {
+        constexpr Loot lootTable[] = {
             {842, 1, 10},   // 5000
             {1043, 1, 25},  // 1000
             {1043, 1, 60},  // 250
@@ -1961,20 +1961,14 @@ public:
             {1042, 1, 100}, // 50
         };
 
-        // A flag to check if the player already received a loot
         bool receivedLoot = false;
-        uint32 i = 0;
-        // Iterate through the loot table
-        while (!receivedLoot && i < lootTable.size())
-        {
-            if (urand(0, 100) < lootTable[i].percentage)
-            {
+        for (unsigned int i = 0; !receivedLoot && i < sizeof(lootTable) / sizeof(Loot); i++) {
+            if (urand(0, 100) <= lootTable[i].percentage) {
                 player->AddItem(lootTable[i].itemId, lootTable[i].count);
                 receivedLoot = true;
             }
-            ++i;
         }
-        return false;
+        return false;        
     }
 
 private:

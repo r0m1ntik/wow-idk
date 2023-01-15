@@ -158,7 +158,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
 /// WorldSession destructor
 WorldSession::~WorldSession()
 {
-    LoginDatabase.Execute("UPDATE account SET totaltime = {}, bonuses = {}, autobroacast = {} WHERE id = {}", GetTotalTime(), GetBonuses(), GetAutobroadcast(), GetAccountId());
+    LoginDatabase.Execute("UPDATE account SET totaltime = {}, bonuses = {}, autobroadcast = {} WHERE id = {}", GetTotalTime(), GetBonuses(), GetAutobroadcast(), GetAccountId());
 
     ///- unload player if not unloaded
     if (_player)

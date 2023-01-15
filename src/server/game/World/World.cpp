@@ -2566,9 +2566,7 @@ void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, Tea
                 itr->second != self &&
                 (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
         {
-            // Autobroadcast
-            if (itr->second->GetPlayer()->GetSession()->GetAutobroadcast() && self == nullptr)
-                itr->second->SendPacket(packet);
+            itr->second->SendPacket(packet);
         }
     }
 }
@@ -2661,25 +2659,17 @@ void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
 
     Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
     Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
+
     for (auto const& itr : m_sessions)
     {
         if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
-        {
             continue;
-        }
 
-        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
-        {
-            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
-            {
-                continue;
-            }
+        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED) && itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+            continue;
 
-            // broadcast for account
-            if (!itr.second->GetPlayer()->GetSession()->GetAutobroadcast()) {
-                continue;
-            }
-        }
+        if (!itr.second->GetPlayer()->GetSession()->GetAutobroadcast() && string_id == LANG_AUTO_BROADCAST && flag == ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST)
+            continue;
 
         wt_do(itr.second->GetPlayer());
     }
