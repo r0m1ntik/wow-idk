@@ -2566,7 +2566,9 @@ void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, Tea
                 itr->second != self &&
                 (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
         {
-            itr->second->SendPacket(packet);
+            // Autobroadcast
+            if (itr->second->GetPlayer()->GetSession()->GetAutobroadcast() && self == nullptr)
+                itr->second->SendPacket(packet);
         }
     }
 }
@@ -2670,6 +2672,11 @@ void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
         {
             if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
             {
+                continue;
+            }
+
+            // broadcast for account
+            if (!itr.second->GetPlayer()->GetSession()->GetAutobroadcast()) {
                 continue;
             }
         }
