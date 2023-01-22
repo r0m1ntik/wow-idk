@@ -183,8 +183,8 @@ public:
 
         if (_channelMgr)
         {
-            if (Channel* channel = _channelMgr->GetJoinChannel("world", 5))
-                channel->JoinChannel(player->GetSession()->GetPlayer(), "");
+            if (Channel* channel = _channelMgr->GetJoinChannel("ПоискСпутников", 5))
+                channel->JoinChannel(player->GetSession()->GetPlayer(), "ПоискСпутников");
         }
     }
 
