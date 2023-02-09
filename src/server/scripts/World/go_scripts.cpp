@@ -2003,7 +2003,7 @@ public:
             player->SummonGameObject(500007, x, y, z, ang, 0, 0, rot2, rot3, 60000);
         }
 
-        player->AddItem(22898, 1);
+        player->AddItem(33217, 1);
         return false;        
     }
 };
