@@ -4162,3 +4162,17 @@ Metric.OverallStatusInterval = 1
 
 #
 ###################################################################################################
+
+#
+# Custom Premium
+Rate.Honor.Premium = 2.000000
+Rate.Rank.Premium = 2.000000
+
+# AntiDraw
+Arena.AntiDraw.Enabled = 1
+
+# Arena cap dayly
+Arena.CapPerDay = 400
+
+#
+###################################################################################################
