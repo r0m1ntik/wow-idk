@@ -533,7 +533,7 @@ enum WintergraspWorldstates
     WORLDSTATE_ALLIANCE_KEEP_DEFENDED = 4025,
 };
 
-// TODO: Handle this with creature_text ?
+/// @todo: Handle this with creature_text ?
 enum eWGText
 {
     BATTLEFIELD_WG_TEXT_START                    = 28,
