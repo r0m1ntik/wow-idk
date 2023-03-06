@@ -143,7 +143,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
 
     _offlineTime = 0;
     _kicked = false;
-    _shouldSetOfflineInDB = true;
 
     _timeSyncNextCounter = 0;
     _timeSyncTimer = 0;
@@ -177,8 +176,7 @@ WorldSession::~WorldSession()
     while (_recvQueue.next(packet))
         delete packet;
 
-    if (GetShouldSetOfflineInDB())
-        LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
+    LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
 }
 
 void WorldSession::SetBonuses(uint32 Bonuses)
@@ -352,7 +350,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
                     if (!m_playerRecentlyLogout)
                     {
-                        // requeuePackets.push_back(packet);
+                        requeuePackets.push_back(packet);
                         deletePacket = false;
 
                         LOG_DEBUG("network", "Re-enqueueing packet with opcode {} with with status STATUS_LOGGEDIN. "
@@ -537,7 +535,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
         if (!m_Socket)
         {
-            return false;
+            return false;                                       //Will remove this session from the world session map
         }
     }
 
