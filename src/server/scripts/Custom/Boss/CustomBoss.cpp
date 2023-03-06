@@ -135,7 +135,7 @@ class event_npc_firelord : public CreatureScript
                 summons.Summon(summon);
             }
 
-            void EnterCombat(Unit* /*pWho*/) override
+            void EnterCombat(Unit* /*pWho*/)
             {
                 me->Yell(FIRE_SAY_AGGRO, LANG_UNIVERSAL);
                 summons.DespawnAll();
@@ -376,7 +376,7 @@ class event_npc_icelord : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* /*pWho*/) override
+            void EnterCombat(Unit* /*pWho*/)
             {
                 me->Yell(ICE_SAY_AGGRO, LANG_UNIVERSAL);
             }
@@ -548,7 +548,7 @@ class event_npc_earthlord : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* /*pWho*/) override
+            void EnterCombat(Unit* /*pWho*/)
             {
                 me->Yell(EARTH_SAY_AGGRO, LANG_UNIVERSAL);
                 me->RemoveAurasDueToSpell(SPELL_FURY);
@@ -741,7 +741,7 @@ class event_npc_darklord : public CreatureScript
                     summon->AI()->AttackStart(pTarget);
             }
 
-            void EnterCombat(Unit* /*pWho*/) override
+            void EnterCombat(Unit* /*pWho*/)
             {
                 me->Yell(DARK_SAY_AGGRO, LANG_UNIVERSAL);
                 me->RemoveAurasDueToSpell(SPELL_FURY);
@@ -960,7 +960,7 @@ class event_mage_ice : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* /*pWho*/) override
+            void EnterCombat(Unit* /*pWho*/)
             {
             }
 
@@ -1068,7 +1068,7 @@ class event_mage_fire : public CreatureScript
             { 
             }
 
-            void EnterCombat(Unit* /*pWho*/) override
+            void EnterCombat(Unit* /*pWho*/)
             {
                 if (me->GetEntry() == 99008) { // альянс босс
                     me->Yell("Неужели вы, безжалостные Орда, думаете, что можете захватить нашу Землю? Мы Альянс, мы мудрость и доблесть. Поднимите оружие и готовьтесь к бою!", LANG_UNIVERSAL);
@@ -1260,7 +1260,7 @@ class event_dk : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* /*pWho*/) override
+            void EnterCombat(Unit* /*pWho*/)
             {
             }
 
@@ -1374,7 +1374,7 @@ class event_warrior : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* /*pWho*/) override
+            void EnterCombat(Unit* /*pWho*/)
             {
             }
 
@@ -1479,7 +1479,7 @@ class IceMan : public CreatureScript
                 me->Say("Уверены?!",LANG_UNIVERSAL);
             }
 
-            void EnterCombat(Unit* /*who*/) override
+            void EnterCombat(Unit* /*who*/)
             {
                 me->Say("Готовьтесь погибнуть, слабые существа! Я, Сверх способный Аномалиус, буду вашим конечным судьбой!",LANG_UNIVERSAL);
             }
