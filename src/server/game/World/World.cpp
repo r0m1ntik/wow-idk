@@ -51,6 +51,7 @@
 #include "GitRevision.h"
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
+#include "GuildLevelMgr.h"
 #include "GuildMgr.h"
 #include "IPLocation.h"
 #include "InstanceSaveMgr.h"
@@ -1087,6 +1088,9 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_GUILD_BANK_TAB_COST_4] = sConfigMgr->GetOption<int32>("Guild.BankTabCost4", 25000000);
     _int_configs[CONFIG_GUILD_BANK_TAB_COST_5] = sConfigMgr->GetOption<int32>("Guild.BankTabCost5", 50000000);
 
+    _int_configs[CONFIG_GUILD_LEVEL_REWARD_KILL_BOSS] = sConfigMgr->GetOption<int32>("Guild.LevelRewardKillBoss", 100);
+    _int_configs[CONFIG_GUILD_LEVEL_REWARD_ITEM_USE] = sConfigMgr->GetOption<int32>("Guild.LevelRewardItemUse", 150);
+
     _bool_configs[CONFIG_DETECT_POS_COLLISION] = sConfigMgr->GetOption<bool>("DetectPosCollision", true);
 
     _bool_configs[CONFIG_RESTRICTED_LFG_CHANNEL]      = sConfigMgr->GetOption<bool>("Channel.RestrictedLfg", true);
@@ -1917,6 +1921,14 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Auctions...");
     sAuctionMgr->LoadAuctions();
 
+    // guild level system
+    LOG_INFO("server.loading", "Load Guild Level...");
+    sGuildLevelMgr->GuildLevelLoadFromDB();
+    LOG_INFO("server.loading", "Load Guild Log...");
+    sGuildLevelMgr->GuildLogLoadFromDB();
+    LOG_INFO("server.loading", "Load Guild Spell...");
+    sGuildLevelMgr->GuildSpellLevelLoadFromDB();
+    
     sGuildMgr->LoadGuilds();
 
     LOG_INFO("server.loading", "Loading ArenaTeams...");
